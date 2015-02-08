@@ -2,7 +2,7 @@ ZipperTree
 ==========
 
 An implementation of Gérard Huet's data structure originally published in
-(Functional Pearl: The Zipper)[https://www.st.cs.uni-saarland.de/edu/seminare/2005/advanced-fp/docs/huet-zipper.pdf]
+[Functional Pearl: The Zipper](https://www.st.cs.uni-saarland.de/edu/seminare/2005/advanced-fp/docs/huet-zipper.pdf)
 
 ## WTF is a Zipper
 A zipper is a novel method for encoding a focus, or position state of a collection
