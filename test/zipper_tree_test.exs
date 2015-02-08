@@ -37,4 +37,13 @@ defmodule ZipperTreeTest do
   test "left", meta do
     assert "1" == value left right down meta.tree
   end
+
+  test "nth" do
+    tree = [
+      item(value: "1"),
+      item(value: "2"),
+      item(value: "3")
+    ]
+    assert "3" == value nth(tree, 3)
+  end
 end

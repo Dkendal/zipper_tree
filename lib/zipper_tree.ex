@@ -60,6 +60,22 @@ defmodule ZipperTree do
         {:error, "right of last"}
     end
   end
+  # let nth loc = nthrec
+  # where rec nthrec = function
+  # 1 -> go_down(loc)
+  # | n -> if n>0 then go_right(nthrec (n-1))
+  # else failwith "nth expects a positive integer";;
+  def nth loc, n do
+    case n do
+      1 ->
+        down loc
+      _ when n > 0  ->
+        right nth(loc, n-1)
+      _ ->
+        {:error, "nth expects a postive integer"}
+    end
+
+  end
 
   @spec value(loc) :: Type
   def value {:loc, {:item, val}, _} do
