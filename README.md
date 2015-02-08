@@ -13,7 +13,7 @@ above, although usage does not necessarily require you understand it's implement
 
 ## Usage
 The implementation provided works for trees of variadic arity, simply define a
-tree of type `@type tree :: record(:item, value: Type) | [tree]`
+tree of type `@type tree :: Type | [tree]`
 
 Tree traversal is done using the following:
 ```elixir
