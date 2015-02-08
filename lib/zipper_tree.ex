@@ -41,7 +41,7 @@ defmodule ZipperTree do
       Top ->
         {:error, "left of top"}
 
-      {:path, [], up, right} ->
+      {:path, [], _, _} ->
         {:error, "left of first"}
 
       {:path, [l|left], up, right} ->
@@ -62,7 +62,7 @@ defmodule ZipperTree do
   end
 
   @spec value(loc) :: Type
-  def value {:loc, {:item, val}, p} do
+  def value {:loc, {:item, val}, _} do
     val
   end
 
