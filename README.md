@@ -14,8 +14,22 @@ above, although usage does not necessarily require you understand it's implement
 ## Usage
 The implementation provided works for trees of variadic arity, simply define a
 tree of type `@type tree :: record(:item, value: Type) | [tree]`
+
+Tree traversal is done using the following:
+```elixir
+down(loc()) :: loc()
+down(tree()) :: loc()
+left(loc()) :: loc()
+right(loc()) :: loc()
+up(loc()) :: loc()
+```
+To access the value of a leaf use `value(loc()) :: Type`, trying to access the
+value of a non-leaf node will return `{:error, _}`. Likewise, invalid move
+operations (up from the root, down from a leaf, etc.) will return `{:error, _}`
+as per standard convention.
+####e.g.
 ``` elixir
-  tree = [
+  iex> tree = [
     item(value: "1"),
     item(value: "+"),
     [
@@ -28,18 +42,12 @@ tree of type `@type tree :: record(:item, value: Type) | [tree]`
       ]
     ]
   ]
+  iex> tree |> down |> value
+  "1"
+  iex> tree |> down |> right |> right |> down |> value
+  "2"
+  iex> tree |> down |> right |> right |> down |> right |> right
+  {:loc, [{:item, "3"}, {:item, "-"}, {:item, "4"}],
+    {:path, [{:item, "*"}, {:item, "2"}], {:path, [{:item, "+"}, {:item, "1"}], Top, []}, []}}
+  
 ```
-
-Tree traversal is done using the following:
-```
-down(loc()) :: loc()
-down(tree()) :: loc()
-left(loc()) :: loc()
-right(loc()) :: loc()
-up(loc()) :: loc()
-```
-
-To access the value of a leaf use `value(loc()) :: Type`, trying to access the
-value of a non-leaf node will return `{:error, _}`. Likewise, invalid move
-operations (up from the root, down from a leaf, etc.) will return `{:error, _}`
-as per standard convention.
