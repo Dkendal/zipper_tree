@@ -22,6 +22,7 @@ down(tree()) :: loc()
 left(loc()) :: loc()
 right(loc()) :: loc()
 up(loc()) :: loc()
+nth(loc(), Integer) :: loc()
 ```
 To access the value of a leaf use `value(loc()) :: Type`, trying to access the
 value of a non-leaf node will return `{:error, _}`. Likewise, invalid move
@@ -29,7 +30,7 @@ operations (up from the root, down from a leaf, etc.) will return `{:error, _}`
 as per standard convention.
 ####e.g.
 ``` elixir
-  iex> tree = [
+  iex()> tree = [
       "1",
       "+",
       [
@@ -42,12 +43,10 @@ as per standard convention.
         ]
       ]
     ]
-iex> tree |> down |> value
+iex()> tree |> down |> value
 "1"
-iex> tree |> down |> right |> right |> down |> value
+iex()> tree |> down |> right |> right |> down |> value
 "2"
-iex> tree |> down |> right |> right |> down |> right |> right
-{:loc, ["3", "-", "4"],
-  {:path, ["*", "2"], {:path, ["+", "1"], Top, []}, []}}
-  
+iex()> tree |> nth 3 |> nth 3                                                 
+{:loc, ["3", "-", "4"], {:path, ["*", "2"], {:path, ["+", "1"], Top, []}, []}}
 ```
