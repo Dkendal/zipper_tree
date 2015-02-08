@@ -1,8 +1,7 @@
 defmodule ZipperTree do
   require Record
 
-  Record.defrecord :item, value: nil
-  @type tree :: record(:item, value: Type) | [tree]
+  @type tree :: Type | [tree]
 
   Record.defrecord :path, left: [], up: Top, right: []
   @type path :: Top | record(:path, left: [tree], up: path, right: [tree])
@@ -18,10 +17,10 @@ defmodule ZipperTree do
   @spec down(loc) :: loc
   def down {:loc, t, p} do
     case t do
-      {:item, _} ->
-        {:error, "at leaf"}
       [h|trees] ->
         loc location: h, path: path(up: p, right: trees)
+      _ ->
+        {:error, "at leaf"}
     end
   end
 
@@ -60,11 +59,7 @@ defmodule ZipperTree do
         {:error, "right of last"}
     end
   end
-  # let nth loc = nthrec
-  # where rec nthrec = function
-  # 1 -> go_down(loc)
-  # | n -> if n>0 then go_right(nthrec (n-1))
-  # else failwith "nth expects a positive integer";;
+
   def nth loc, n do
     case n do
       1 ->
@@ -74,12 +69,8 @@ defmodule ZipperTree do
       _ ->
         {:error, "nth expects a postive integer"}
     end
-
   end
 
   @spec value(loc) :: Type
-  def value {:loc, {:item, val}, _} do
-    val
-  end
-
+  def value({:loc, val, _}), do: val
 end

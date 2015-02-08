@@ -30,24 +30,24 @@ as per standard convention.
 ####e.g.
 ``` elixir
   iex> tree = [
-    item(value: "1"),
-    item(value: "+"),
-    [
-      item(value: "2"),
-      item(value: "*"),
+      "1",
+      "+",
       [
-        item(value: "3"),
-        item(value: "-"),
-        item(value: "4"),
+        "2",
+        "*",
+        [
+          "3",
+          "-",
+          "4",
+        ]
       ]
     ]
-  ]
 iex> tree |> down |> value
 "1"
 iex> tree |> down |> right |> right |> down |> value
 "2"
 iex> tree |> down |> right |> right |> down |> right |> right
-{:loc, [{:item, "3"}, {:item, "-"}, {:item, "4"}],
-  {:path, [{:item, "*"}, {:item, "2"}], {:path, [{:item, "+"}, {:item, "1"}], Top, []}, []}}
+{:loc, ["3", "-", "4"],
+  {:path, ["*", "2"], {:path, ["+", "1"], Top, []}, []}}
   
 ```

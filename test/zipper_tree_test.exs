@@ -5,15 +5,15 @@ defmodule ZipperTreeTest do
   setup do
     # 1 + 2 * ( 3 - 4 )
     tree = [
-      item(value: "1"),
-      item(value: "+"),
+      "1",
+      "+",
       [
-        item(value: "2"),
-        item(value: "*"),
+        "2",
+        "*",
         [
-          item(value: "3"),
-          item(value: "-"),
-          item(value: "4"),
+          "3",
+          "-",
+          "4",
         ]
       ]
     ]
@@ -22,6 +22,7 @@ defmodule ZipperTreeTest do
 
   test "down", meta do
     assert "1" == value down meta.tree
+    assert {:error, "at leaf"} == down down meta.tree
   end
 
   test "up", meta do
@@ -40,10 +41,10 @@ defmodule ZipperTreeTest do
 
   test "nth" do
     tree = [
-      item(value: "1"),
-      item(value: "2"),
-      item(value: "3")
+      1,
+      2,
+      3
     ]
-    assert "3" == value nth(tree, 3)
+    assert 3 == value nth(tree, 3)
   end
 end
