@@ -47,4 +47,9 @@ defmodule ZipperTreeTest do
     ]
     assert 3 == value nth(tree, 3)
   end
+
+  test "change" do
+    tree = [1,2,[3, 4]]
+    assert {:loc, [1,2,[5, 4]], _} = tree |> nth(3) |> down |> change(5) |> up |> up
+  end
 end

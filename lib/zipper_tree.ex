@@ -71,6 +71,8 @@ defmodule ZipperTree do
     end
   end
 
+  def change({:loc, _, p}, t), do: {:loc, t, p}
+
   @spec value(loc) :: Type
   def value({:loc, val, _}), do: val
 end
