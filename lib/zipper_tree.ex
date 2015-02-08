@@ -71,6 +71,15 @@ defmodule ZipperTree do
     end
   end
 
+  def top l do
+    case l do
+      {:loc, _, Top} ->
+        l
+      _ ->
+        top up l
+    end
+  end
+
   def change({:loc, _, p}, t), do: {:loc, t, p}
 
   @spec value(loc) :: Type
