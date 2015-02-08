@@ -42,12 +42,12 @@ as per standard convention.
       ]
     ]
   ]
-  iex> tree |> down |> value
-  "1"
-  iex> tree |> down |> right |> right |> down |> value
-  "2"
-  iex> tree |> down |> right |> right |> down |> right |> right
-  {:loc, [{:item, "3"}, {:item, "-"}, {:item, "4"}],
-    {:path, [{:item, "*"}, {:item, "2"}], {:path, [{:item, "+"}, {:item, "1"}], Top, []}, []}}
+iex> tree |> down |> value
+"1"
+iex> tree |> down |> right |> right |> down |> value
+"2"
+iex> tree |> down |> right |> right |> down |> right |> right
+{:loc, [{:item, "3"}, {:item, "-"}, {:item, "4"}],
+  {:path, [{:item, "*"}, {:item, "2"}], {:path, [{:item, "+"}, {:item, "1"}], Top, []}, []}}
   
 ```
