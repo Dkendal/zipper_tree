@@ -82,6 +82,41 @@ defmodule ZipperTree do
 
   def change({:loc, _, p}, t), do: {:loc, t, p}
 
+  #let insert_right (Loc(t,p)
+  #) r = match p with
+  #Top -> failwith "insert of top"
+  #| Node(left,up,right) -> Loc(t,Node(left,up,r::right));;
+  def insert_right {:loc, t, p}, r do
+    case p do
+      Top ->
+        {:error, "insert of top"}
+      {:path, left, up, right} ->
+        {:loc, t, {:path, left, up, [r|right]}}
+    end
+  end
+
+  def insert_left {:loc, t, p}, l do
+    case p do
+      Top ->
+        {:error, "insert of top"}
+
+      {:path, left, up, right} ->
+        {:loc, t, {:path, [l|left], up, right}}
+    end
+  end
+
+  #let insert_down (Loc(t,p)) t1 = match t with
+  #Item(_) -> failwith "down of item"
+  #| Section(sons) -> Loc(t1,Node([],p,sons));;
+  def insert_down {:loc, t, p}, t1 do
+    case t do
+      _ when is_list t ->
+        {:loc, t1, path(up: p, right: t)}
+      _ ->
+        {:error, "cannot insert below leaf"}
+    end
+  end
+
   @spec value(loc) :: Type
   def value({:loc, val, _}), do: val
 end
