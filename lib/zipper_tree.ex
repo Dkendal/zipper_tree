@@ -1,60 +1,59 @@
 defmodule ZipperTree do
   require Record
 
-  @type tree :: Type | [tree]
-
-  Record.defrecord :path, left: [], up: Top, right: []
-  @type path :: Top | record(:path, left: [tree], up: path, right: [tree])
-
-  Record.defrecord :loc, location: nil, path: Top
-  @type loc :: record :loc, location: tree, path: path
-
-  @spec down(tree) :: loc
-  def down(l) when is_list l do
-    down loc(location: l)
+  defmodule Node do
+    defstruct left: [], up: Top, right: []
   end
 
-  @spec down(loc) :: loc
-  def down {:loc, t, p} do
+  defmodule Loc do
+    defstruct loc: nil, path: Top
+  end
+
+  def down(l) when is_list l do
+    down %Loc{ loc: l }
+  end
+
+  def down %Loc{loc: t, path: p} do
     case t do
       [h|trees] ->
-        loc location: h, path: path(up: p, right: trees)
+        %Loc{loc: h, path: %Node{ up: p, right: trees }}
+
       _ ->
         {:error, "at leaf"}
     end
   end
 
-  @spec up(loc) :: loc
-  def up {:loc, t, p} do
+  def up %Loc{loc: t, path: p} do
     case p do
       Top ->
         {:error, "at top"}
-      {:path, left, up, right} ->
-        loc location: Enum.reverse(left) ++ [t | right], path: up
+
+      %Node{left: left, up: up, right: right} ->
+        %Loc{loc: Enum.reverse(left) ++ [t | right], path: up}
     end
   end
 
-  @spec left(loc) :: loc
-  def left {:loc, t, p} do
+  def left %Loc{loc: t, path: p} do
     case p do
       Top ->
         {:error, "left of top"}
 
-      {:path, [], _, _} ->
+      %Node{left: [], up: _, right: _} ->
         {:error, "left of first"}
 
-      {:path, [l|left], up, right} ->
-        loc(location: l, path: path(left: left, up: up, right: [t|right]))
+      %Node{left: [l|left], up: up, right: right} ->
+        %Loc{loc: l, path: %Node{left: left, up: up, right: [t|right]}}
     end
   end
 
-  @spec right(loc) :: loc
-  def right {:loc, t, p} do
+  def right %Loc{loc: t, path: p} do
     case p do
       Top ->
         {:error, "right of top"}
-      {:path, left, up, [r|right]} ->
-        loc(location: r, path: path(left: [t|left], up: up, right: right))
+
+      %Node{left: left, up: up, right: [r|right]} ->
+        %Loc{loc: r, path: %Node{left: [t|left], up: up, right: right}}
+
       _ ->
         {:error, "right of last"}
     end
@@ -64,8 +63,10 @@ defmodule ZipperTree do
     case n do
       1 ->
         down loc
+
       _ when n > 0  ->
         right nth(loc, n-1)
+
       _ ->
         {:error, "nth expects a postive integer"}
     end
@@ -73,43 +74,43 @@ defmodule ZipperTree do
 
   def top l do
     case l do
-      {:loc, _, Top} ->
+      %Loc{loc: _, path: Top} ->
         l
+
       _ ->
         top up l
     end
   end
 
-  def change({:loc, _, p}, t), do: {:loc, t, p}
+  def change(%Loc{loc: _, path: p}, t), do: %Loc{loc: t, path: p}
 
-  def insert_right {:loc, t, p}, r do
-    case p do
-      Top ->
-        {:error, "insert of top"}
-      {:path, left, up, right} ->
-        {:loc, t, {:path, left, up, [r|right]}}
-    end
-  end
-
-  def insert_left {:loc, t, p}, l do
+  def insert_right %Loc{loc: t, path: p}, r do
     case p do
       Top ->
         {:error, "insert of top"}
 
-      {:path, left, up, right} ->
-        {:loc, t, {:path, [l|left], up, right}}
+      %Node{right: right} ->
+        %Loc{loc: t, path: %Node{p | right: [r|right]}}
     end
   end
 
-  def insert_down {:loc, t, p}, t1 do
+  def insert_left %Loc{loc: t, path: p}, l do
+    case p do
+      Top ->
+        {:error, "insert of top"}
+
+      %Node{left: left} ->
+        %Loc{loc: t, path: %Node{p | left: [l|left]}}
+    end
+  end
+
+  def insert_down %Loc{loc: t, path: p}, t1 do
     case t do
       _ when is_list t ->
-        {:loc, t1, path(up: p, right: t)}
+        %Loc{loc: t1, path: %Node{up: p, right: t}}
+
       _ ->
         {:error, "cannot insert below leaf"}
     end
   end
-
-  @spec value(loc) :: Type
-  def value({:loc, val, _}), do: val
 end
