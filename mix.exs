@@ -1,9 +1,11 @@
 defmodule ZipperTree.Mixfile do
   use Mix.Project
 
+  @version "0.1.0"
+
   def project do
     [app: :zipper_tree,
-     version: "0.0.1"
+     version: @version,
      elixir: "~> 1.0",
      deps: deps,
 
