@@ -3,9 +3,13 @@ defmodule ZipperTree.Mixfile do
 
   def project do
     [app: :zipper_tree,
-     version: "0.0.1",
+     version: "0.0.1"
      elixir: "~> 1.0",
-     deps: deps]
+     deps: deps,
+
+     # Hex
+     description: description,
+     package: package]
   end
 
   # Configuration for the OTP application
@@ -20,6 +24,19 @@ defmodule ZipperTree.Mixfile do
       :dev -> [ :reprise ]
       _ -> []
     end
+  end
+
+
+  defp description do
+    """
+    Methods for travelsal and modification of Trees using a zipper.
+    """
+  end
+
+  defp package do
+    [contributors: ["Dylan Kendal"],
+     licenses: ["Do What The Fuck You Want To Public License (WTFPL)"],
+     links: %{"GitHub" => "https://github.com/Dkendal/zipper_tree"}]
   end
 
   # Dependencies can be Hex packages:
