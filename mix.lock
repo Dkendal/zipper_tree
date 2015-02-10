@@ -1,1 +1,2 @@
-%{"apex": {:hex, :apex, "0.3.2"}}
+%{"apex": {:hex, :apex, "0.3.2"},
+  "reprise": {:hex, :reprise, "0.3.0"}}

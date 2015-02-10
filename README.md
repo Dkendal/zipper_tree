@@ -1,8 +1,17 @@
 ZipperTree
 ==========
+Provides traversal and modification methods for variadic arity tree's. All
+methods maintain an active 'cursor' or focus in the tree. The methods will
+also technically work for lists too - I guess, if you're into that sorta
+thing.
 
-An implementation of Gérard Huet's data structure originally published in
-[Functional Pearl: The Zipper](https://www.st.cs.uni-saarland.de/edu/seminare/2005/advanced-fp/docs/huet-zipper.pdf)
+All traversal and insertion methods happen in constant time with exception to
+up, which is porportional to how many nodes were junior to the current subtree.
+
+This is an implementation of Gérard Huet's tree with a zipper (originally
+published in [Functional Pearl: The
+Zipper](https://www.st.cs.uni-saarland.de/edu/seminare/2005/advanced-fp/docs/huet-zipper.pdf)),
+essentially a direct conversion of the published oocaml code to elixir.
 
 ## WTF is a Zipper
 A zipper is a novel method for encoding a focus, or position state of a collection
@@ -13,40 +22,41 @@ above, although usage does not necessarily require you understand it's implement
 
 ## Usage
 The implementation provided works for trees of variadic arity, simply define a
-tree of type `@type tree :: Type | [tree]`
-
-Tree traversal is done using the following:
+tree using nested lists
 ```elixir
-down(loc()) :: loc()
-down(tree()) :: loc()
-left(loc()) :: loc()
-right(loc()) :: loc()
-up(loc()) :: loc()
-nth(loc(), Integer) :: loc()
+iex(4)> import ZipperTree
+tree = [
+  1,
+  2,
+  [
+    3,
+    4
+  ]
+...(4)> ]
+[1, 2, [3, 4]]
+iex(5)> tree |> nth(3)
+%ZipperTree.Loc{loc: [3, 4],
+ path: %ZipperTree.Node{left: [2, 1], right: [], up: Top}}
+iex(6)> tree |> nth(3) |> right
+{:error, "right of last"}
+iex(7)> tree |> nth(3) |> down
+%ZipperTree.Loc{loc: 3,
+ path: %ZipperTree.Node{left: [], right: [4],
+  up: %ZipperTree.Node{left: [2, 1], right: [], up: Top}}}
+iex(8)> tree |> nth(3) |> down |> right
+%ZipperTree.Loc{loc: 4,
+ path: %ZipperTree.Node{left: [3], right: [],
+  up: %ZipperTree.Node{left: [2, 1], right: [], up: Top}}}
+iex(9)> tree |> nth(3) |> down |> right |> top
+%ZipperTree.Loc{loc: [1, 2, [3, 4]], path: Top}
+iex(10)> tree |> nth(3) |> down |> right |> change(:sup) |> top
+%ZipperTree.Loc{loc: [1, 2, [3, :sup]], path: Top}
+iex(11)> tree |> nth(3) |> down |> right |> insert_left(:over_here_now) |> top
+%ZipperTree.Loc{loc: [1, 2, [3, :over_here_now, 4]], path: Top}
 ```
-To access the value of a leaf use `value(loc()) :: Type`, trying to access the
-value of a non-leaf node will return `{:error, _}`. Likewise, invalid move
-operations (up from the root, down from a leaf, etc.) will return `{:error, _}`
-as per standard convention.
-####e.g.
-``` elixir
-  iex()> tree = [
-      "1",
-      "+",
-      [
-        "2",
-        "*",
-        [
-          "3",
-          "-",
-          "4",
-        ]
-      ]
-    ]
-iex()> tree |> down |> value
-"1"
-iex()> tree |> down |> right |> right |> down |> value
-"2"
-iex()> tree |> nth 3 |> nth 3                                                 
-{:loc, ["3", "-", "4"], {:path, ["*", "2"], {:path, ["+", "1"], Top, []}, []}}
+
+Then move around the tree using `down`, `left`, `right`, `up`, `nth`, `top` and
+make modifications with `change`, `insert_down`, `insert_left`, `insert_right`.
+
+For specific method examples check the tests.
 ```
