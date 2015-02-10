@@ -25,6 +25,14 @@ defmodule ZipperTree.Mixfile do
   #
   # Type `mix help deps` for more examples and options
   defp deps do
-    []
+    case Mix.env do
+      :dev ->
+        [
+          {:apex, "~>0.3.2"}
+        ]
+      _ ->
+        [
+        ]
+    end
   end
 end
