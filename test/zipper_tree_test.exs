@@ -2,7 +2,6 @@ defmodule ZipperTreeTest do
   use ExUnit.Case, async: true
   import ZipperTree
   alias ZipperTree.Loc, as: Loc
-  alias ZipperTree.Node, as: Node
 
   setup do
     # 1 + 2 * ( 3 - 4 )
