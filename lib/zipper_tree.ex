@@ -1,6 +1,4 @@
 defmodule ZipperTree do
-  require Record
-
   defmodule Node do
     defstruct left: [], up: Top, right: []
   end
