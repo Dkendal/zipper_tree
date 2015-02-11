@@ -28,7 +28,7 @@ defmodule ZipperTree do
     loc: the currently focused subtree.
     path: the current path back up the tree, read: ZipperTree.Node
     """
-    defstruct loc: nil, path: Top
+    defstruct loc: [], path: Top
   end
 
   def down(l) when is_list l do
