@@ -21,6 +21,8 @@ For a better description of the data structure I recommend you read the paper li
 above, although usage does not necessarily require you understand it's implementation.
 
 ## Usage
+Just add `{"zipper_tree", "~> 0.1.0"}` to your dependencies.
+
 The implementation provided works for trees of variadic arity, simply define a
 tree using nested lists
 ```elixir
@@ -68,3 +70,9 @@ Then move around the tree using `down`, `left`, `right`, `up`, `nth`, `top` and
 make modifications with `change`, `insert_down`, `insert_left`, `insert_right`.
 
 For specific method examples check the tests.
+
+## Road map
+[x] traversal
+[x] modification and insertion
+[ ] various search strategies
+[ ] ???
