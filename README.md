@@ -21,7 +21,7 @@ For a better description of the data structure I recommend you read the paper li
 above, although usage does not necessarily require you understand it's implementation.
 
 ## Usage
-Just add `{:zipper_tree, "~> 0.1.0"}` to your dependencies.
+Just add `{:zipper_tree, "~> 0.1.1"}` to your dependencies.
 
 The implementation provided works for trees of variadic arity, simply define a
 tree using nested lists
@@ -39,30 +39,52 @@ iex(4)> tree = [
 
 [1, 2, [3, 4]]
 
-iex(5)> tree |> nth(3)
+iex(5)> tree
+  |> nth(3)
 %ZipperTree.Loc{loc: [3, 4],
  path: %ZipperTree.Node{left: [2, 1], right: [], up: Top}}
 
-iex(6)> tree |> nth(3) |> right
+iex(6)> tree
+  |> nth(3)
+  |> right
 {:error, "right of last"}
 
-iex(7)> tree |> nth(3) |> down
+iex(7)> tree
+  |> nth(3)
+  |> down
 %ZipperTree.Loc{loc: 3,
  path: %ZipperTree.Node{left: [], right: [4],
   up: %ZipperTree.Node{left: [2, 1], right: [], up: Top}}}
 
-iex(8)> tree |> nth(3) |> down |> right
+iex(8)> tree
+  |> nth(3)
+  |> down
+  |> right
 %ZipperTree.Loc{loc: 4,
  path: %ZipperTree.Node{left: [3], right: [],
   up: %ZipperTree.Node{left: [2, 1], right: [], up: Top}}}
 
-iex(9)> tree |> nth(3) |> down |> right |> top
+iex(9)> tree
+  |> nth(3)
+  |> down
+  |> right
+  |> top
 %ZipperTree.Loc{loc: [1, 2, [3, 4]], path: Top}
 
-iex(10)> tree |> nth(3) |> down |> right |> change(:sup) |> top
+iex(10)> tree
+  |> nth(3)
+  |> down
+  |> right
+  |> change(:sup)
+  |> top
 %ZipperTree.Loc{loc: [1, 2, [3, :sup]], path: Top}
 
-iex(11)> tree |> nth(3) |> down |> right |> insert_left(:over_here_now) |> top
+iex(11)> tree
+  |> nth(3)
+  |> down
+  |> right
+  |> insert_left(:over_here_now)
+  |> top
 %ZipperTree.Loc{loc: [1, 2, [3, :over_here_now, 4]], path: Top}
 ```
 
