@@ -72,7 +72,7 @@ make modifications with `change`, `insert_down`, `insert_left`, `insert_right`.
 For specific method examples check the tests.
 
 ## Road map
-[x] traversal
-[x] modification and insertion
-[ ] various search strategies
-[ ] ???
+- [x] traversal
+- [x] modification and insertion
+- [ ] various search strategies
+- [ ] ???
