@@ -31,6 +31,13 @@ defmodule ZipperTree do
     defstruct loc: [], path: Top
   end
 
+  @doc """
+  Convience method to quickly initializie a tree with a list instead of calling
+  down on it.
+  """
+  @spec tree(list()) :: %Loc{}
+  def tree(l), do: %Loc{loc: l}
+
   def down(l) when is_list l do
     down %Loc{ loc: l }
   end

@@ -73,4 +73,10 @@ defmodule ZipperTreeTest do
     assert %Loc{loc: [1,2,[3,4,5]]} = [1,2,[4,5]] |> nth(3) |> insert_down(3) |> top
     assert {:error, "cannot insert below leaf"} = [1,2] |> down |> insert_down 1
   end
+
+  test "creates a tree from a list", meta do
+    list = meta.tree
+    assert tree(list) === %Loc{loc: list, path: Top}
+  end
+
 end
