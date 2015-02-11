@@ -96,5 +96,6 @@ For specific method examples check the tests.
 ## Road map
 - [x] traversal
 - [x] modification and insertion
+- [ ] implement protocols (Enum, etc.)
 - [ ] various search strategies
 - [ ] ???
