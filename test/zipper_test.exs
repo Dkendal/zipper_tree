@@ -121,7 +121,7 @@ defmodule ZipperTest do
 
   test "postwalk transformation", context do
     assert { :loc, 2, Top } = Z.postwalk ( Z.open context.bxt ), fn ( { f, args } ) ->
-      if is_function(f), do: apply(f, args)
+      is_function(f) && apply(f, args) || { f, args }
     end
   end
 end

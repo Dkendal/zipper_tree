@@ -183,13 +183,14 @@ defmodule Zipper do
   end
 
   # Transformations
-  defp transform( node, fun ) when is_node node do
-    fun.(node) || node
+  @spec transform( tree, ( tree -> any ) ) :: any
+  defp transform( tree, fun ) when is_node tree do
+    fun.(tree)
   end
 
   defp transform( leaf, fun ) do
     r = fun.({leaf, []})
-    is_tuple(r) and elem(r, 0) || leaf
+    is_tuple(r) and elem(r, 0) || nil
   end
 
   @spec prewalk( location, ( tree -> tree ) ) :: location
@@ -221,6 +222,10 @@ defmodule Zipper do
     postwalk ( down t ), fun
   end
 
+  def postwalk { :loc, _leaf, _path } = t, fun do
+     postwalk t, fun, :cont
+  end
+
   def postwalk { :loc, node, path } = t, fun, :cont do
     t = change t, transform(node, fun)
     cond do
@@ -234,12 +239,4 @@ defmodule Zipper do
         t |> up |> postwalk fun, :cont
     end
   end
-
-  def postwalk { :loc, _leaf, _path } = t, fun do
-     postwalk t, fun, :cont
-  end
-
-  #@spec walk( location, ( tree -> tree ), ( tree -> any )  ) :: any
-  #def walk t, inner, outer do
-  #end
 end
