@@ -174,7 +174,7 @@ defmodule Zipper do
     end
   end
 
-  defmacro is_node n do
+  defmacro is_tree n do
     quote do
       is_tuple( unquote n )
       and tuple_size(unquote n) == 2
@@ -184,7 +184,7 @@ defmodule Zipper do
 
   # Transformations
   @spec transform( tree, ( tree -> any ) ) :: any
-  defp transform( tree, fun ) when is_node tree do
+  defp transform( tree, fun ) when is_tree tree do
     fun.(tree)
   end
 
@@ -194,11 +194,11 @@ defmodule Zipper do
   end
 
   @spec prewalk( location, ( tree -> tree ) ) :: location
-  def prewalk( { :loc, tree, _path } = t, fun ) when is_node( tree ) do
+  def prewalk( { :loc, tree, _path } = t, fun ) when is_tree( tree ) do
     loc t, current: ( prewalk tree, fun )
   end
 
-  def prewalk(tree, fun) when is_node tree do
+  def prewalk(tree, fun) when is_tree tree do
     { value, children } = transform tree, fun
     { value, ( Enum.map children, &(prewalk &1, fun) ) }
   end
@@ -208,7 +208,7 @@ defmodule Zipper do
   end
 
   @spec postwalk( location, ( tree -> tree ) ) :: location
-  def postwalk( { :loc, tree, _path } = t, fun ) when is_node( tree ) do
+  def postwalk( { :loc, tree, _path } = t, fun ) when is_tree( tree ) do
     loc t, current: ( postwalk tree, fun )
   end
 
