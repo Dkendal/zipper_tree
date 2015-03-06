@@ -8,7 +8,7 @@ defmodule ZipperTree.Mixfile do
      version: @version,
      elixir: "~> 1.0",
      deps: deps,
-
+     test_coverage: [tool: Coverex.Task, coveralls: true, debug: true],
      # Hex
      description: description,
      package: package]
@@ -53,6 +53,7 @@ defmodule ZipperTree.Mixfile do
     [
       {:apex, "~>0.3.2", only: :dev},
       {:reprise, "~> 0.3.0", only: :dev},
+      {:coverex, "~> 1.2.0", only: :test},
       {:dbg, "~> 1.0.0", only: [:dev, :test]}
     ]
   end
