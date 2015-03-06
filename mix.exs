@@ -18,16 +18,15 @@ defmodule ZipperTree.Mixfile do
   #
   # Type `mix help compile.app` for more information
   def application do
-    [applications: [:logger] ++ dev_apps]
+    [
+      applications: [:logger] ++
+      case Mix.env do
+        :test -> [ :dbg ]
+        :dev  -> [ :reprise ]
+        :prod -> []
+      end
+    ]
   end
-
-  def dev_apps do
-    case Mix.env do
-      :dev -> [ :reprise ]
-      _ -> []
-    end
-  end
-
 
   defp description do
     """
@@ -53,7 +52,8 @@ defmodule ZipperTree.Mixfile do
   defp deps do
     [
       {:apex, "~>0.3.2", only: :dev},
-      {:reprise, "~> 0.3.0", only: :dev}
+      {:reprise, "~> 0.3.0", only: :dev},
+      {:dbg, "~> 1.0.0", only: [:dev, :test]}
     ]
   end
 end

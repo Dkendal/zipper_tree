@@ -1,2 +1,3 @@
 %{"apex": {:hex, :apex, "0.3.2"},
+  "dbg": {:hex, :dbg, "1.0.0"},
   "reprise": {:hex, :reprise, "0.3.0"}}
