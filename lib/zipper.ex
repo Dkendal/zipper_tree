@@ -194,49 +194,30 @@ defmodule Zipper do
   end
 
   @spec prewalk( location, ( tree -> tree ) ) :: location
-  def prewalk( { :loc, node, _path } = t, fun ) when is_node node do
-    ( change t, transform(node, fun) )
-    |> down
-    |> prewalk fun
+  def prewalk( { :loc, tree, _path } = t, fun ) when is_node( tree ) do
+    loc t, current: ( prewalk tree, fun )
   end
 
-  def prewalk { :loc, leaf, _path } = t, fun do
-    ( change t, transform(leaf, fun) )
-    |> prewalk fun, :cont
+  def prewalk(tree, fun) when is_node tree do
+    { value, children } = transform tree, fun
+    { value, ( Enum.map children, &(prewalk &1, fun) ) }
   end
 
-  def prewalk { :loc, _, Top } = t, _fun, :cont do
-    t
-  end
-
-  def prewalk { :loc, _, path } = t, fun, :cont do
-    if length( path.right ) > 0 do
-       t |> right |> prewalk fun
-    else
-       t |> up |> prewalk fun, :cont
-    end
+  def prewalk(leaf, fun) do
+    transform leaf, fun
   end
 
   @spec postwalk( location, ( tree -> tree ) ) :: location
-  def postwalk( { :loc, node, _path } = t, fun ) when is_node( node ) do
-    postwalk ( down t ), fun
+  def postwalk( { :loc, tree, _path } = t, fun ) when is_node( tree ) do
+    loc t, current: ( postwalk tree, fun )
   end
 
-  def postwalk { :loc, _leaf, _path } = t, fun do
-     postwalk t, fun, :cont
+  def postwalk({ value, children }, fun) do
+    { value, ( Enum.map children, &(postwalk &1, fun) ) }
+    |> transform fun
   end
 
-  def postwalk { :loc, node, path } = t, fun, :cont do
-    t = change t, transform(node, fun)
-    cond do
-      path == Top ->
-        t
-
-      length( path.right ) > 0 ->
-        t |> right |> postwalk fun
-
-      true ->
-        t |> up |> postwalk fun, :cont
-    end
+  def postwalk(leaf, fun) do
+    transform leaf, fun
   end
 end
