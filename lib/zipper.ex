@@ -131,8 +131,9 @@ defmodule Zipper do
     end
   end
 
-  def change( { :loc, { _, c }, p }, t ), do: { :loc, { t, c }, p }
   def change( { :loc, _, p }, t ), do: { :loc, t, p }
+  def change_value( { :loc, { _, c }, p }, t ), do: { :loc, { t, c }, p }
+  def change_value( { :loc, _, p }, t ), do: { :loc, t, p }
 
   @doc ~S"""
   Insert a new leaf to the right of the current node.
@@ -172,4 +173,73 @@ defmodule Zipper do
         { :loc, { leaf, [ d ] }, p }
     end
   end
+
+  defmacro is_node n do
+    quote do
+      is_tuple( unquote n )
+      and tuple_size(unquote n) == 2
+      and unquote(n) |> elem(1) |> is_list
+    end
+  end
+
+  # Transformations
+  defp transform( node, fun ) when is_node node do
+    fun.(node) || node
+  end
+
+  defp transform( leaf, fun ) do
+    r = fun.({leaf, []})
+    is_tuple(r) and elem(r, 0) || leaf
+  end
+
+  @spec prewalk( location, ( tree -> tree ) ) :: location
+  def prewalk( { :loc, node, _path } = t, fun ) when is_node node do
+    ( change t, transform(node, fun) )
+    |> down
+    |> prewalk fun
+  end
+
+  def prewalk { :loc, leaf, _path } = t, fun do
+    ( change t, transform(leaf, fun) )
+    |> prewalk fun, :cont
+  end
+
+  def prewalk { :loc, _, Top } = t, _fun, :cont do
+    t
+  end
+
+  def prewalk { :loc, _, path } = t, fun, :cont do
+    if length( path.right ) > 0 do
+       t |> right |> prewalk fun
+    else
+       t |> up |> prewalk fun, :cont
+    end
+  end
+
+  @spec postwalk( location, ( tree -> tree ) ) :: location
+  def postwalk( { :loc, node, _path } = t, fun ) when is_node( node ) do
+    postwalk ( down t ), fun
+  end
+
+  def postwalk { :loc, node, path } = t, fun, :cont do
+    t = change t, transform(node, fun)
+    cond do
+      path == Top ->
+        t
+
+      length( path.right ) > 0 ->
+        t |> right |> postwalk fun
+
+      true ->
+        t |> up |> postwalk fun, :cont
+    end
+  end
+
+  def postwalk { :loc, _leaf, _path } = t, fun do
+     postwalk t, fun, :cont
+  end
+
+  #@spec walk( location, ( tree -> tree ), ( tree -> any )  ) :: any
+  #def walk t, inner, outer do
+  #end
 end

@@ -21,6 +21,10 @@ defmodule ZipperTest do
     simple = { 1, [ { 2, [ 3 ] } ] }
     simple_tree = {:loc, {1, [{2, [3]}]}, Top}
 
+    bxt = { &+/2,
+            [ 1,
+              { &-/2, [ 3, 2 ] } ] }
+
     #      1
     # 2 3 [4] 5 6
     wide_tree = {:loc, 4,
@@ -37,6 +41,7 @@ defmodule ZipperTest do
     { :ok,
       tree: tree,
       simple: simple,
+      bxt: bxt,
       leaf: leaf,
       wide_tree: wide_tree,
       simple_tree: simple_tree }
@@ -84,9 +89,9 @@ defmodule ZipperTest do
   end
 
   test "changing a value", context do
-    assert { :loc, 9, _ } = ( Z.change context.leaf, 9 )
+    assert { :loc, 9, _ } = ( Z.change_value context.leaf, 9 )
     assert { :loc, { 9, _ }, _ } =
-      ( Z.change ( Z.down context.simple_tree ), 9 )
+      ( Z.change_value ( Z.down context.simple_tree ), 9 )
   end
 
   test "inserting a value to the right", context do
@@ -105,5 +110,18 @@ defmodule ZipperTest do
     # at node
     assert { :loc, { 1, [ 9, { 2, [ 3 ] } ] }, _ } =
       ( Z.insert_down context.simple_tree, 9 )
+  end
+
+  test "prewalk transformation", context do
+    tree = { :loc, { 2, [ { 4, [ 6 ] }, { 8, [ { 10, [ 12 ] }, 14 ] } ] }, Top }
+    assert ^tree = Z.prewalk ( Z.open context.tree ), fn ( { x, c } ) ->
+      { x * 2, c }
+    end
+  end
+
+  test "postwalk transformation", context do
+    assert { :loc, 2, Top } = Z.postwalk ( Z.open context.bxt ), fn ( { f, args } ) ->
+      if is_function(f), do: apply(f, args)
+    end
   end
 end
