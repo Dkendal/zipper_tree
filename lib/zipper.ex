@@ -181,7 +181,11 @@ defmodule Zipper do
     r
   end
 
-  @spec prewalk( location, ( tree -> tree ) ) :: location
+  @spec prewalk( location, ( tree -> any ) ) :: location
+  @doc """
+  preform a pre order walk, applying the function `fun` to each subtree.
+  fun :: (tree -> any)
+  """
   def prewalk( { :loc, tree, _path } = l, fun ) do
     loc l, current: ( prewalk tree, fun )
   end
@@ -195,7 +199,11 @@ defmodule Zipper do
     transform leaf, fun
   end
 
-  @spec postwalk( location, ( tree -> tree ) ) :: location
+  @spec postwalk( location, ( tree -> any ) ) :: location
+  @doc """
+  preform a post order walk, applying the function `fun` to each subtree.
+  fun :: (tree -> any)
+  """
   def postwalk( { :loc, tree, _path } = l, fun ) do
     loc l, current: ( postwalk tree, fun )
   end
