@@ -28,14 +28,15 @@ defmodule Zipper do
 
   @type path :: %Path{ left: [tree], up: path, right: [tree] } | Top
   @type location :: { :loc, tree, path }
-  @type tree :: { any, [tree | any] }
+  @type leaf :: any
+  @type tree :: [ leaf | [tree | leaf] ]
 
   @doc """
   Used convert a tree type into a location type.
   Required before any Zipper methods can be called on it.
   """
   @spec open( tree ) :: location
-  def open( { _, c } = t ) when is_list c do
+  def open( [ _ | c ] = t ) when is_list c do
     loc( current: t, context: Top  )
   end
 
@@ -43,7 +44,7 @@ defmodule Zipper do
   Returns the value of the current node or leaf.
   """
   @spec value( location ) :: any
-  def value( { :loc, { v, _ }, _ } ), do: v
+  def value( { :loc, [ v | _ ], _ } ), do: v
 
   @doc ~S"""
   Descend down into the pre order child of this node.
@@ -55,7 +56,7 @@ defmodule Zipper do
   """
   def down { :loc, t, p } do
     case t do
-      { val, [ c | children ] } ->
+      [ val, c | children ] ->
         { :loc, c, %Path{ up: p, right: children, parent: val } }
 
       _ ->
@@ -72,7 +73,7 @@ defmodule Zipper do
         {:error, "at top"}
 
       %Path{left: left, up: up, right: right, parent: parent} ->
-        { :loc, { parent, Enum.reverse(left) ++ [t | right] }, up }
+        { :loc, [ parent | Enum.reverse(left) ++ [t | right] ], up }
     end
   end
 
@@ -132,8 +133,7 @@ defmodule Zipper do
   end
 
   def change( { :loc, _, p }, t ), do: { :loc, t, p }
-  def change_value( { :loc, { _, c }, p }, t ), do: { :loc, { t, c }, p }
-  def change_value( { :loc, _, p }, t ), do: { :loc, t, p }
+  def change_value( { :loc, [ _ | c ], p }, t ), do: { :loc, [ t | c ], p }
 
   @doc ~S"""
   Insert a new leaf to the right of the current node.
@@ -165,42 +165,30 @@ defmodule Zipper do
   Insert a new leaf below the current node. If the current node is a leaf it
   will be converted to a node.
   """
-  def insert_down { :loc, t, p }, d do
-    case t do
-      { val, children } ->
-        { :loc, { val, [ d | children ] }, p }
-      leaf ->
-        { :loc, { leaf, [ d ] }, p }
-    end
-  end
-
-  defmacro is_tree n do
-    quote do
-      is_tuple( unquote n )
-      and tuple_size(unquote n) == 2
-      and unquote(n) |> elem(1) |> is_list
-    end
+  def insert_down loc() = t, d do
+    [ val | children ] = List.wrap(loc t, :current)
+    loc t, current: [ val, d | children ]
   end
 
   # Transformations
   @spec transform( tree, ( tree -> any ) ) :: any
-  defp transform( tree, fun ) when is_tree tree do
+  defp transform( tree, fun ) when is_list tree do
     fun.(tree)
   end
 
   defp transform( leaf, fun ) do
-    r = fun.({leaf, []})
-    is_tuple(r) and elem(r, 0) || nil
+    [ r ] = fun.([ leaf ])
+    r
   end
 
   @spec prewalk( location, ( tree -> tree ) ) :: location
-  def prewalk( { :loc, tree, _path } = t, fun ) when is_tree( tree ) do
+  def prewalk( { :loc, tree, _path } = t, fun ) when is_list tree do
     loc t, current: ( prewalk tree, fun )
   end
 
-  def prewalk(tree, fun) when is_tree tree do
-    { value, children } = transform tree, fun
-    { value, ( Enum.map children, &(prewalk &1, fun) ) }
+  def prewalk(tree, fun) when is_list tree do
+    [ value | children ] = transform tree, fun
+    [ value | ( Enum.map children, &(prewalk &1, fun) ) ]
   end
 
   def prewalk(leaf, fun) do
@@ -208,12 +196,12 @@ defmodule Zipper do
   end
 
   @spec postwalk( location, ( tree -> tree ) ) :: location
-  def postwalk( { :loc, tree, _path } = t, fun ) when is_tree( tree ) do
+  def postwalk( { :loc, tree, _path } = t, fun ) when is_list tree do
     loc t, current: ( postwalk tree, fun )
   end
 
-  def postwalk({ value, children }, fun) do
-    { value, ( Enum.map children, &(postwalk &1, fun) ) }
+  def postwalk([ value | children ], fun) do
+    [ value | ( Enum.map children, &(postwalk &1, fun) ) ]
     |> transform fun
   end
 

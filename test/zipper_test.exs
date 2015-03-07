@@ -10,21 +10,12 @@ defmodule ZipperTest do
     # 3   5   7
     #    /
     #   6
-    tree = { 1,
-             [
-               { 2, [ 3 ] },
-               { 4,
-                 [
-                   { 5, [ 6 ] },
-                   7 ] } ] }
+    tree = [ 1, [ 2, 3 ], [ 4, [ 5, 6 ], 7 ] ]
 
-    simple = { 1, [ { 2, [ 3 ] } ] }
-    simple_tree = {:loc, {1, [{2, [3]}]}, Top}
+    simple = [ 1, [ 2, 3 ] ]
+    simple_tree = {:loc, [ 1, [ 2, 3 ] ], Top}
 
-    bxt = { &+/2,
-            [ 1,
-              { &-/2, [ 3, 2 ] } ] }
-
+    bxt = [ &+/2, 1, [ &-/2, 3, 2 ] ]
     #      1
     # 2 3 [4] 5 6
     wide_tree = {:loc, 4,
@@ -61,7 +52,7 @@ defmodule ZipperTest do
   end
 
   test "descending a tree", context do
-    assert { :loc, { 2, [ 3 ] }, _ } = ( Z.down context.simple_tree )
+    assert { :loc, [ 2, 3 ], _ } = ( Z.down context.simple_tree )
     assert { :error, "at leaf" } = ( Z.down context.leaf )
   end
 
@@ -88,11 +79,15 @@ defmodule ZipperTest do
     assert { :loc, ^t, _ } = ( Z.top context.leaf )
   end
 
-  test "changing a value", context do
-    assert { :loc, 9, _ } = ( Z.change_value context.leaf, 9 )
-    assert { :loc, { 9, _ }, _ } =
+  test "replacing the current subtree", context do
+    assert { :loc, [9, 10], _ } = ( Z.change context.leaf, [9, 10] )
+  end
+
+  test "changing the value of the node", context do
+    assert { :loc, [ 9, _ ], _ } =
       ( Z.change_value ( Z.down context.simple_tree ), 9 )
   end
+
 
   test "inserting a value to the right", context do
     assert { :loc, _, %Z.Path{ right: [ 9 | _ ] } } =
@@ -104,24 +99,25 @@ defmodule ZipperTest do
       ( Z.insert_left context.leaf, 9 )
   end
 
+  test "inserting a value below a leaf creates a new node", context do
+    assert { :loc, [ 3, 9 ], _ } = ( Z.insert_down context.leaf, 9 )
+  end
+
   test "inserting a value below the current node", context do
-    # at leaf
-    assert { :loc, { 3, [ 9 ] }, _ } = ( Z.insert_down context.leaf, 9 )
-    # at node
-    assert { :loc, { 1, [ 9, { 2, [ 3 ] } ] }, _ } =
+    assert { :loc, [ 1, 9, [ 2, 3 ] ], _ } =
       ( Z.insert_down context.simple_tree, 9 )
   end
 
   test "prewalk transformation", context do
-    tree = { :loc, { 2, [ { 4, [ 6 ] }, { 8, [ { 10, [ 12 ] }, 14 ] } ] }, Top }
-    assert ^tree = Z.prewalk ( Z.open context.tree ), fn ( { x, c } ) ->
-      { x * 2, c }
+    tree = { :loc, [ 2, [ 4, 6 ], [ 8, [ 10, 12 ], 14 ] ], Top }
+    assert ^tree = Z.prewalk ( Z.open context.tree ), fn ( [ x | c ] ) ->
+      [ x * 2 | c ]
     end
   end
 
   test "postwalk transformation", context do
-    assert { :loc, 2, Top } = Z.postwalk ( Z.open context.bxt ), fn ( { f, args } ) ->
-      is_function(f) && apply(f, args) || { f, args }
+    assert { :loc, 2, Top } = Z.postwalk ( Z.open context.bxt ), fn ( [ f | args ] ) ->
+      is_function(f) && apply(f, args) || [ f | args ]
     end
   end
 end
