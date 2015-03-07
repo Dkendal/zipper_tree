@@ -165,9 +165,9 @@ defmodule Zipper do
   Insert a new leaf below the current node. If the current node is a leaf it
   will be converted to a node.
   """
-  def insert_down loc() = t, d do
-    [ val | children ] = List.wrap(loc t, :current)
-    loc t, current: [ val, d | children ]
+  def insert_down { :loc, tree, _path } = l, d do
+    [ val | children ] = List.wrap tree
+    loc l, current: [ val, d | children ]
   end
 
   # Transformations
@@ -182,8 +182,8 @@ defmodule Zipper do
   end
 
   @spec prewalk( location, ( tree -> tree ) ) :: location
-  def prewalk( { :loc, tree, _path } = t, fun ) when is_list tree do
-    loc t, current: ( prewalk tree, fun )
+  def prewalk( { :loc, tree, _path } = l, fun ) do
+    loc l, current: ( prewalk tree, fun )
   end
 
   def prewalk(tree, fun) when is_list tree do
@@ -196,8 +196,8 @@ defmodule Zipper do
   end
 
   @spec postwalk( location, ( tree -> tree ) ) :: location
-  def postwalk( { :loc, tree, _path } = t, fun ) when is_list tree do
-    loc t, current: ( postwalk tree, fun )
+  def postwalk( { :loc, tree, _path } = l, fun ) do
+    loc l, current: ( postwalk tree, fun )
   end
 
   def postwalk([ value | children ], fun) do
