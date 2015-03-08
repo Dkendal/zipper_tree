@@ -115,9 +115,21 @@ defmodule ZipperTest do
     end
   end
 
+  test "prewalk transformation that doesn't return a tree", context do
+    assert {:loc, [1,1], Top} == Z.prewalk context.simple_tree, fn ( [ x | c ] ) ->
+      ( rem x, 2 ) == 0 && ( x - 1 ) || [ x | c ]
+    end
+  end
+
   test "postwalk transformation", context do
     assert { :loc, 2, Top } = Z.postwalk ( Z.open context.bxt ), fn ( [ f | args ] ) ->
       is_function(f) && apply(f, args) || [ f | args ]
+    end
+  end
+
+  test "postwalk transformation that doesn't return a tree", context do
+    assert {:loc, [1,1], Top} == Z.postwalk context.simple_tree, fn ( [ x | c ] ) ->
+      ( rem x, 2 ) == 0 && ( x - 1 ) || [ x | c ]
     end
   end
 end

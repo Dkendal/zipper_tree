@@ -190,13 +190,12 @@ defmodule Zipper do
     loc l, current: ( prewalk tree, fun )
   end
 
-  def prewalk(tree, fun) when is_list tree do
-    [ value | children ] = transform tree, fun
-    [ value | ( Enum.map children, &(prewalk &1, fun) ) ]
-  end
-
-  def prewalk(leaf, fun) do
-    transform leaf, fun
+  def prewalk(tree, fun) do
+    [ value | children ] = List.wrap fun.( ( List.wrap tree ) )
+    case children do
+      [] -> value
+      _ -> [ value | ( Enum.map children, &(prewalk &1, fun) ) ]
+    end
   end
 
   @spec postwalk( location, ( tree -> any ) ) :: location
